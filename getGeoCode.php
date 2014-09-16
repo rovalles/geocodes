@@ -49,7 +49,7 @@
         $outputFile;
         foreach($files as $k => $t){
             $outputFile = fopen($k, "w") or die("Unable to open file!");
-            fwrite($outputFile, $t);
+            fwrite($outputFile, "$t");
         }
     }
 
@@ -60,10 +60,10 @@
             if($key == 0){
                 $firstRow = implode(',', array_keys($row));
             }
-            $csv .= implode(',', $row) . "\n";
+            $csv .= implode(',', $row) . "\r\n";
         }
 
-        return $firstRow . '\n' . $csv;
+        return $firstRow . "\r\n" . $csv;
     }
 
     function init($file){
@@ -90,7 +90,7 @@
             $newCsv = convert2Csv($newCsv);
 
 
-            /* $export[$file] = $originalCsv; */
+            $export['retailers1.csv'] = $originalCsv;
             $export['output.csv'] = $newCsv;
             export($export);
         }
