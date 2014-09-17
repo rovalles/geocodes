@@ -4,6 +4,7 @@
     $args = $_SERVER['argv'];
     $file = $args[1];
     $output = $args[2];
+    $csvKeyCount = 0;
 
     function getCsv($file){
         if(preg_match("/\.csv$/", $file)){
@@ -17,6 +18,8 @@
         $csv = array_map('str_getcsv', $csv);
         $csvShift = array_shift($csv);
         $arr = array();
+
+        // count($csvShift);
         foreach ($csv as $c) {
           $arr[] = array_combine($csvShift, $c);
         }
@@ -44,32 +47,32 @@
         }
     }
 
-
-    function export($files){
-        $outputFile;
-        foreach($files as $k => $t){
-            $outputFile = fopen($k, "w") or die("Unable to open file!");
-            fwrite($outputFile, "$t");
-        }
-    }
-
-    function convert2Csv($array){
+    function convert2Csv($array, $allowKeys = false){
         $csv = '';
         $firstRow = '';
         foreach($array as $key => $row) {
-            if($key == 0){
-                $firstRow = implode(',', array_keys($row));
+            if($key == 0 && $allowKeys){
+                $firstRow = implode(',', array_keys($row)) . "\r\n";
             }
             $csv .= implode(',', $row) . "\r\n";
         }
 
-        return $firstRow . "\r\n" . $csv;
+        return $firstRow . $csv;
     }
 
-    function init($file){
+    function export($fileName, $content, $allowKeys = false){
+        if( $allowKeys ){
+            file_put_contents($fileName, "$content", FILE_APPEND);
+        }else{
+            file_put_contents($fileName, "$content");
+        }
+    }
+
+    function init($file, $output){
         $originalCsv = array();
         $newCsv = array();
         $export = array();
+        $allowKeys = count(file($output)) == 0 ? true : false;
 
         $csv = getCsv($file);
         if($csv){
@@ -87,14 +90,12 @@
             }
 
             $originalCsv = convert2Csv($originalCsv);
-            $newCsv = convert2Csv($newCsv);
+            $newCsv = convert2Csv($newCsv, $allowKeys);
 
-
-            $export['retailers1.csv'] = $originalCsv;
-            $export['output.csv'] = $newCsv;
-            export($export);
+            export($file, $originalCsv);
+            export($output, $newCsv, !$allowKeys);
         }
     }
 
-    init($file);
+    init($file, $output);
 ?>
