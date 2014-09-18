@@ -100,7 +100,7 @@
         }
     }
 
-    if(count(file($file)) == 0){
+    if(count(file($file)) > 0){
         init($file, $output);
     }
 ?>
