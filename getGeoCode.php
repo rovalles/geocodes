@@ -21,7 +21,9 @@
 
         // count($csvShift);
         foreach ($csv as $c) {
-          $arr[] = array_combine($csvShift, $c);
+            if(count($csvShift) == count($c)){
+                $arr[] = array_combine($csvShift, $c);
+            }
         }
 
         return $arr;
@@ -37,7 +39,7 @@
     }
 
     function getGeoLocation($address){
-        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=$address';
+        $url = "https://maps.googleapis.com/maps/api/geocode/json?address=$address";
         $json = file_get_contents($url);
         if($json){
             $geo = json_decode($json, true);
@@ -80,6 +82,7 @@
             foreach($csvArr as $k => $c){
                 $address = returnAddress($c);
                 $geo = getGeoLocation($address);
+
                 if($geo){
                     $csvArr[$k]['lat'] = $geo['lat'];
                     $csvArr[$k]['lng'] = $geo['lng'];
@@ -97,5 +100,7 @@
         }
     }
 
-    init($file, $output);
+    if(count(file($file)) == 0){
+        init($file, $output);
+    }
 ?>
